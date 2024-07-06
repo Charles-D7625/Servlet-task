@@ -10,7 +10,7 @@ public class JdbcConnection {
     
     private static final String APPLICATION_PROPERTIES_FILENAME = "application.properties"; // Название файла с данными о базе данных
 
-    public static Connection connectionToPostgresDB() throws Exception {
+    public Connection connectionToPostgresDB() throws Exception {
 
         Connection connection = null;
 

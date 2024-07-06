@@ -32,6 +32,8 @@ public class ProductDAO {
             listProduct.add(product);
         }
 
+        connection.close();
+
         return listProduct;
     }
 }

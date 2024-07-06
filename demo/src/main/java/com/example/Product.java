@@ -1,5 +1,6 @@
 package com.example;
 
+
 public class Product {
 
     public int id;
