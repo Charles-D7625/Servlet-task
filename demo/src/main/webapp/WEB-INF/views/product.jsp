@@ -9,7 +9,6 @@
     <h1>Product List</h1>
     <table border="1">
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Price</th>
             <th>Quantity</th>
@@ -17,7 +16,6 @@
         </tr>
         <c:forEach var="product" items="${listProduct}">
             <tr>
-                <td>${product.id}</td>
                 <td>${product.name}</td>
                 <td>${product.price}</td>
                 <td>${product.quantity}</td>
