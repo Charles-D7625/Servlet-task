@@ -1,0 +1,6 @@
+target/
+
+/demo/src/main/resources/application.properties
+
+.vscode/
+docker-compose.yaml
