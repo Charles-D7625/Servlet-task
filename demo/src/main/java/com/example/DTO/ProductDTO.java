@@ -1,12 +1,13 @@
-package com.example.DTO;
+package com.example.dto;
 
 import lombok.Data;
 
 @Data
-public class ProductDTO {
+public class ProductDTO  {
 
-    public String name;
-    public double price;
-    public int quantity;
-    public boolean available;
+    private int id;
+    private String name;
+    private double price;
+    private int quantity;
+    private boolean available;
 }

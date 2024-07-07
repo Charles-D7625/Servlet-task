@@ -1,16 +1,21 @@
 package com.example;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Properties;
+import java.util.logging.Logger;
 
-public class JdbcConnection {
+public class JdbcConnection implements Serializable {
     
     private static final String APPLICATION_PROPERTIES_FILENAME = "application.properties"; // Название файла с данными о базе данных
 
-    public Connection connectionToPostgresDB() throws Exception {
+    private transient Logger logger = Logger.getLogger(getClass().getName());
+
+    public Connection connectionToPostgresDB() throws SQLException {
 
         Connection connection = null;
 
@@ -19,7 +24,7 @@ public class JdbcConnection {
         try (InputStream input = Main.class.getClassLoader().getResourceAsStream(APPLICATION_PROPERTIES_FILENAME)) {
             
             if (input == null) {
-                System.out.println("No such a file in resources: " + APPLICATION_PROPERTIES_FILENAME);
+                logger.info("No such a file in resources: " + APPLICATION_PROPERTIES_FILENAME);
                 return null;
             }
 
@@ -32,18 +37,17 @@ public class JdbcConnection {
 
             
             if (connection == null || connection.isClosed()) {
-                try {
-                    Class.forName(props.getProperty("application.driver"));
+                
+                Class.forName(props.getProperty("application.driver"));
 
-                } catch (ClassNotFoundException e) {
-                    throw new Exception(e);
-                }
+                
                 connection = DriverManager.getConnection(url + "/" + dbName, username, password);
             }
 
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        } 
+        
         return connection;
     }
 
