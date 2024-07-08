@@ -3,7 +3,7 @@ package com.example.mappers;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-import com.example.Product;
+import com.example.classes.Product;
 import com.example.dto.ProductDTO;
 
 @Mapper

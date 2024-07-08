@@ -15,6 +15,13 @@
         <p>Price: <input type="text" name="price" value="${product.price != null ? product.price : ''}" /></p>
         <p>Quantity: <input type="text" name="quantity" value="${product.quantity != null ? product.quantity : ''}" /></p>
         <p>Available: <input type="checkbox" name="available" value="true" ${product.available ? "checked" : ""} /></p>
+        <p>Order ID:
+            <select name="order_id">
+                <c:forEach var="orderId" items="${orderIds}">
+                    <option value="${orderId}" ${product != null && product.orderId == orderId ? 'selected' : ''}>${orderId}</option>
+                </c:forEach>
+            </select>
+        </p>
         <p><input type="submit" value="<c:choose><c:when test='${not empty product.id}'>Update</c:when><c:otherwise>Create</c:otherwise></c:choose>" /></p>
     </form>
 </body>

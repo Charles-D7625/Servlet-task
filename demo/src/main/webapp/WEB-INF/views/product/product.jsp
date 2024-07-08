@@ -14,6 +14,7 @@
             <th>Price</th>
             <th>Quantity</th>
             <th>Available</th>
+            <th>Order ID</th>
             <th>Actions</th>
         </tr>
         <c:forEach var="product" items="${listProduct}">
@@ -22,11 +23,10 @@
                 <td>${product.price}</td>
                 <td>${product.quantity}</td>
                 <td>${product.available}</td>
+                <td>${product.orderId}</td>
                 <td>
-                    <form action="edit" method="get">
-                        <input type="hidden" name="id" value="${product.id}" />
-                        <input type="submit" value="Edit" />
-                    </form>
+                    <a href="edit?id=${product.id}">Edit</a>
+                    <a href="delete?id=${product.id}">Delete</a>
                 </td>
             </tr>
         </c:forEach>

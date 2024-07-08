@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.Product;
+import com.example.classes.Product;
 
 public class ProductDAO {
     
@@ -49,6 +49,7 @@ public class ProductDAO {
         statement.setDouble(2, product.getPrice());
         statement.setInt(3, product.getQuantity());
         statement.setBoolean(4, product.isAvailable());
+        statement.setInt(5, product.getOrderId());
 
         boolean rowInserted = statement.executeUpdate() > 0;
         connection.close();
@@ -67,6 +68,7 @@ public class ProductDAO {
         statement.setInt(3, product.getQuantity());
         statement.setBoolean(4, product.isAvailable());
         statement.setInt(5, product.getId());
+        statement.setInt(6, product.getOrderId());
 
         boolean rowUpdated = statement.executeUpdate() > 0;
 
@@ -75,14 +77,25 @@ public class ProductDAO {
         return rowUpdated;
     }
 
+    public boolean deleteProduct(int id, Connection connection) throws SQLException {
+
+        String sqlQuery = "DELETE FROM product " + "WHERE id = ?";
+
+        PreparedStatement statement = connection.prepareStatement(sqlQuery);
+        statement.setInt(1, id);
+        boolean rowDelete = statement.executeUpdate() > 0;
+
+        connection.close();
+
+        return rowDelete;
+    }
+
     public Product getProduct(int id, Connection connection) throws SQLException {
 
         String sqlQuery = "SELECT * " + " FROM product WHERE id = ?";
 
         PreparedStatement statement = connection.prepareStatement(sqlQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-
         statement.setInt(1, id);
-
         ResultSet resultSet = statement.executeQuery();
 
         if(!resultSet.first()) return null;

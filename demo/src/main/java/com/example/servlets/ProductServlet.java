@@ -1,4 +1,4 @@
-package com.example;
+package com.example.servlets;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.example.JdbcConnection;
+import com.example.classes.Product;
+import com.example.dao.OrderDetailDAO;
 import com.example.dao.ProductDAO;
 import com.example.dto.ProductDTO;
 import com.example.mappers.ProductMapper;
@@ -23,6 +26,7 @@ public class ProductServlet extends HttpServlet {
     private final transient Logger logger = Logger.getLogger(getClass().getName());
 
     private static transient ProductDAO productDAO = new ProductDAO();
+    private static transient OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
     private static transient ProductMapper productMapper = ProductMapper.INSTANCE;
     private static transient JdbcConnection connection = new JdbcConnection();
 
@@ -61,6 +65,7 @@ public class ProductServlet extends HttpServlet {
                     break;
                 case "/delete":
                     //Удаление товара из бд
+                    deleteProduct(req, res);
                     break;
                 case "/edit":
                     //Открыть форме для измененеия
@@ -94,7 +99,10 @@ public class ProductServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/views/product/product.jsp").forward(req, res);
     }
 
-    private void showCreateProductForm(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    private void showCreateProductForm(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, SQLException {
+
+        List<Integer> orderIds = orderDetailDAO.getAllOrderIds(connection.connectionToPostgresDB());
+        req.setAttribute("orderIds", orderIds);
 
         req.getRequestDispatcher("/WEB-INF/views/product/product-form.jsp").forward(req, res);
     }
@@ -103,12 +111,14 @@ public class ProductServlet extends HttpServlet {
 
         Product existingProduct = new Product();
         ProductDTO existingProductDTO = new ProductDTO();
+        List<Integer> orderIds = new ArrayList<>();
 
         int id = Integer.parseInt(req.getParameter("id"));
         try {
 
             existingProduct = productDAO.getProduct(id, connection.connectionToPostgresDB());
             existingProductDTO = productMapper.productToProductDTO(existingProduct);
+            orderIds = orderDetailDAO.getAllOrderIds(connection.connectionToPostgresDB());
             
         } catch (SQLException e) {
             logger.info("Query was failed");
@@ -119,6 +129,8 @@ public class ProductServlet extends HttpServlet {
         }
 
         req.setAttribute("product", existingProductDTO);
+        req.setAttribute("orderIds", orderIds);
+
         req.getRequestDispatcher("/WEB-INF/views/product/product-form.jsp").forward(req, res);
     }
 
@@ -129,6 +141,7 @@ public class ProductServlet extends HttpServlet {
         double price = Double.parseDouble(req.getParameter("price"));
         int quantity = Integer.parseInt(req.getParameter("quantity"));
         boolean available = Boolean.parseBoolean(req.getParameter("available"));
+        int orderId = Integer.parseInt(req.getParameter("order_id"));
 
         ProductDTO productDTO = new ProductDTO();
 
@@ -137,6 +150,7 @@ public class ProductServlet extends HttpServlet {
         productDTO.setPrice(price);
         productDTO.setQuantity(quantity);
         productDTO.setAvailable(available);
+        productDTO.setOrderId(orderId);
 
         Product product = productMapper.productDTOTProduct(productDTO);
 
@@ -152,10 +166,19 @@ public class ProductServlet extends HttpServlet {
         productDTO.setPrice(Double.parseDouble(req.getParameter("price")));
         productDTO.setQuantity(Integer.parseInt(req.getParameter("quantity")));
         productDTO.setAvailable(Boolean.parseBoolean(req.getParameter("available")));
+        productDTO.setOrderId(Integer.parseInt(req.getParameter("order_id")));
 
         Product product = productMapper.productDTOTProduct(productDTO);
 
         productDAO.insertProduct(product, connection.connectionToPostgresDB());
+        res.sendRedirect(req.getContextPath() + "/product/");
+    }
+
+    private void deleteProduct(HttpServletRequest req, HttpServletResponse res) throws IOException, SQLException {
+
+        int id = Integer.parseInt(req.getParameter("id"));
+        productDAO.deleteProduct(id, connection.connectionToPostgresDB());
+
         res.sendRedirect(req.getContextPath() + "/product/");
     }
 }

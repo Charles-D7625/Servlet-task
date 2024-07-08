@@ -10,4 +10,5 @@ public class ProductDTO  {
     private double price;
     private int quantity;
     private boolean available;
+    private int orderId;
 }
