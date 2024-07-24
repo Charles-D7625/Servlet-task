@@ -1,6 +1,7 @@
 package com.example.servlets;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,21 @@ public class ProductServlet extends HttpServlet {
     private static transient OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
     private static transient ProductMapper productMapper = ProductMapper.INSTANCE;
     private static transient JdbcConnection connection = new JdbcConnection();
+
+    public ProductServlet() {
+        super();
+    }
+
+    @Override
+    public void init() {
+        try {
+            connection.connectionToPostgresDB();
+            connection.connectionToPostgresDB().close();
+        } catch (SQLException e) {
+           logger.info("Connection was failed");
+           e.printStackTrace();
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
@@ -81,7 +97,7 @@ public class ProductServlet extends HttpServlet {
 
     }
 
-    private void showAllProducts(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    private void showAllProducts(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, SQLException {
 
         List<Product> listProduct = new ArrayList<>();
         List<ProductDTO> listProductDTO = new ArrayList<>();
@@ -138,7 +154,7 @@ public class ProductServlet extends HttpServlet {
 
         int id = Integer.parseInt(req.getParameter("id"));
         String name = req.getParameter("name");
-        double price = Double.parseDouble(req.getParameter("price"));
+        BigDecimal price = new BigDecimal(req.getParameter("price"));
         int quantity = Integer.parseInt(req.getParameter("quantity"));
         boolean available = Boolean.parseBoolean(req.getParameter("available"));
         int orderId = Integer.parseInt(req.getParameter("order_id"));
@@ -163,7 +179,7 @@ public class ProductServlet extends HttpServlet {
         ProductDTO productDTO = new ProductDTO();
 
         productDTO.setName(req.getParameter("name"));
-        productDTO.setPrice(Double.parseDouble(req.getParameter("price")));
+        productDTO.setPrice(new BigDecimal(req.getParameter("price")));
         productDTO.setQuantity(Integer.parseInt(req.getParameter("quantity")));
         productDTO.setAvailable(Boolean.parseBoolean(req.getParameter("available")));
         productDTO.setOrderId(Integer.parseInt(req.getParameter("order_id")));

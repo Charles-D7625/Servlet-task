@@ -1,16 +1,13 @@
-package com.example.classes;
-
-import java.util.List;
+package com.example.dto;
 
 import com.example.enums.OrderStatus;
 
 import lombok.Data;
 
 @Data
-public class OrderDetail {
+public class OrderDetailDTO {
 
     private int id;
     private OrderStatus orderStatus;
     private double totalAmount;
-    List<Product> products;
 }

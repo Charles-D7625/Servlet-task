@@ -27,9 +27,10 @@ public class ProductDAO {
 
             product.setId(resultSet.getInt(1));
             product.setName(resultSet.getString(2));
-            product.setPrice(resultSet.getDouble(3));
+            product.setPrice(resultSet.getBigDecimal(3));
             product.setQuantity(resultSet.getInt(4));
             product.setAvailable(resultSet.getBoolean(5));
+            product.setOrderId(resultSet.getInt(6));
 
             listProduct.add(product);
         }
@@ -41,12 +42,12 @@ public class ProductDAO {
 
     public boolean insertProduct(Product product, Connection connection) throws SQLException {
 
-        String sqlQuery = "INSERT INTO product (name, price, quantity, available) VALUES (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO product (name, price, quantity, available, order_id) VALUES (?, ?, ?, ?, ?)";
 
         PreparedStatement statement = connection.prepareStatement(sqlQuery);
 
         statement.setString(1, product.getName());
-        statement.setDouble(2, product.getPrice());
+        statement.setBigDecimal(2, product.getPrice());
         statement.setInt(3, product.getQuantity());
         statement.setBoolean(4, product.isAvailable());
         statement.setInt(5, product.getOrderId());
@@ -59,16 +60,16 @@ public class ProductDAO {
 
     public boolean updateProduct(Product product, Connection connection) throws SQLException {
 
-        String sqlQuery = "UPDATE product SET name = ?, price = ?, quantity = ?, available = ? WHERE id = ?";
+        String sqlQuery = "UPDATE product SET name = ?, price = ?, quantity = ?, available = ?, order_id = ? WHERE id = ?";
 
         PreparedStatement statement = connection.prepareStatement(sqlQuery);
 
         statement.setString(1, product.getName());
-        statement.setDouble(2, product.getPrice());
+        statement.setBigDecimal(2, product.getPrice());
         statement.setInt(3, product.getQuantity());
         statement.setBoolean(4, product.isAvailable());
-        statement.setInt(5, product.getId());
-        statement.setInt(6, product.getOrderId());
+        statement.setInt(5, product.getOrderId());
+        statement.setInt(6, product.getId());
 
         boolean rowUpdated = statement.executeUpdate() > 0;
 
@@ -104,9 +105,10 @@ public class ProductDAO {
 
         product.setId(resultSet.getInt(1));
         product.setName(resultSet.getString(2));
-        product.setPrice(resultSet.getDouble(3));
+        product.setPrice(resultSet.getBigDecimal(3));
         product.setQuantity(resultSet.getInt(4));
         product.setAvailable(resultSet.getBoolean(5));
+        product.setOrderId(resultSet.getInt(6));
 
         connection.close();
 
