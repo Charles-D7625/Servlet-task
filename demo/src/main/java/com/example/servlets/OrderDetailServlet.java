@@ -1,9 +1,9 @@
 package com.example.servlets;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -14,6 +14,7 @@ import com.example.dao.OrderDetailDAO;
 import com.example.dto.OrderDetailDTO;
 import com.example.enums.OrderStatus;
 import com.example.mappers.OrderDetailMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -24,7 +25,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/order-detail/*")
 public class OrderDetailServlet extends HttpServlet {
 
-    private static final String REDIRECT_URL_PATH = "/order-detail/";
+    private static final String REDIRECT_URL_PATH = "/order-detail";
 
     private final transient Logger logger = Logger.getLogger(getClass().getName());
 
@@ -50,46 +51,41 @@ public class OrderDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
 
-        String action = req.getPathInfo();
+        String pathInfo = req.getPathInfo();
 
-        try {
-            switch (action) {
-                case "/update":
-                    updateOrderDetail(req, res);
-                    break;
-                default:
-                    showAllOrderDetail(req, res);
-                    break;
+        try {       
+            if(pathInfo == null) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action parameter is missing");
+            } else if(pathInfo.equals("/update")) {
+                updateOrderDetail(req, res);
             }
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
         
-        String action = req.getPathInfo();
+        String pathInfo = req.getPathInfo();
 
         try {
-            switch (action) {
-                case "/new":
-                    insertOrderDetail(req, res);
-                    break;
-                case "/delete":
-                    deleteOrderDetail(req, res);
-                    break;
-                case "/edit":
-                    showEditOrderDetailForm(req, res);
-                    break;
-                default:
-                    showAllOrderDetail(req, res);
-                    break;
+            if( pathInfo== null || pathInfo.equals("/")) {
+                showAllOrderDetail(req, res);
+            } else if (pathInfo.equals("/edit")) {
+                showEditOrderDetailForm(req, res);
+            } else if (pathInfo.equals("/new")) {
+                insertOrderDetail(req, res);
+            } else if(pathInfo.equals("/delete")) {
+                deleteOrderDetail(req, res);
+            } else if(pathInfo.equals("/json")) {
+                viewOrderDetailAsJson(req, res);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }      
+
     }
 
     private void showAllOrderDetail(HttpServletRequest req, HttpServletResponse res) {
@@ -143,7 +139,7 @@ public class OrderDetailServlet extends HttpServlet {
 
         int id = Integer.parseInt(req.getParameter("id"));
         OrderStatus orderStatus = OrderStatus.valueOf(req.getParameter("orderStatus"));
-        double totalAmount = Double.parseDouble(req.getParameter("totalAmount"));
+        BigDecimal totalAmount = new BigDecimal(req.getParameter("totalAmount"));
 
         OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
 
@@ -170,5 +166,20 @@ public class OrderDetailServlet extends HttpServlet {
         orderDetailDAO.deleteOrderDetail(id, connection.connectionToPostgresDB());
 
         res.sendRedirect(req.getContextPath() + REDIRECT_URL_PATH);
+    }
+
+    private void viewOrderDetailAsJson(HttpServletRequest req, HttpServletResponse res) throws IOException {
+
+        try {
+            List<OrderDetail> listOrderDetail = orderDetailDAO.getOrderDetailWithProduct(connection.connectionToPostgresDB());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(listOrderDetail);
+            res.setContentType("application/json");
+            res.getWriter().write(json);
+            
+        } catch (NumberFormatException | SQLException e) {
+            e.printStackTrace();
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 }

@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Product List</h1>
-    <a href="new">New Product</a>
+    <a href="${pageContext.request.contextPath}/product/new">New Product</a>
     <table border="1">
         <tr>
             <th>Name</th>
@@ -25,8 +25,8 @@
                 <td>${product.available}</td>
                 <td>${product.orderId}</td>
                 <td>
-                    <a href="edit?id=${product.id}">Edit</a>
-                    <a href="delete?id=${product.id}">Delete</a>
+                    <a href="${pageContext.request.contextPath}/product/edit?id=${product.id}">Edit</a>
+                    <a href="${pageContext.request.contextPath}/product/delete?id=${product.id}">Delete</a>
                 </td>
             </tr>
         </c:forEach>

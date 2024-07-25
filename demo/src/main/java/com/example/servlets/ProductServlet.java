@@ -24,6 +24,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/product/*")
 public class ProductServlet extends HttpServlet {
 
+    private static final String REDIRECT_URL_PATH = "/product";
+
     private final transient Logger logger = Logger.getLogger(getClass().getName());
 
     private static transient ProductDAO productDAO = new ProductDAO();
@@ -49,51 +51,41 @@ public class ProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
 
-        String action = req.getPathInfo();
-
+        String pathInfo = req.getPathInfo();
+        
         try {
-            switch (action) {
-                case "/update":
-                    updateProduct(req, res);
-                    break;
-                case "/insert":
-                    insertProduct(req, res);
-                    break;
-                default:
-                    showAllProducts(req, res);
-                    break;
+            if(pathInfo == null) {
+                res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Action parameter is missing");
+            } else if (pathInfo.equals("/update")) {
+                updateProduct(req, res);
+            } else if (pathInfo.equals("/insert")) {
+                insertProduct(req, res);
+            } else if(pathInfo.equals("/delete")) {
+                deleteProduct(req, res);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
         
-        String action = req.getPathInfo();
-
+        String pathInfo = req.getPathInfo();
+        
         try {
-            switch (action) {
-                case "/new":
-                    //Создание нового товара
-                    showCreateProductForm(req, res);
-                    break;
-                case "/delete":
-                    //Удаление товара из бд
-                    deleteProduct(req, res);
-                    break;
-                case "/edit":
-                    //Открыть форме для измененеия
-                    showEditProductForm(req, res);
-                    break;
-                default: // Страница с товарами
-                    showAllProducts(req, res);
-                    break;
+            if(pathInfo == null || pathInfo.equals("/")) {
+                showAllProducts(req, res);
+            } else if (pathInfo.equals("/edit")) {
+                showEditProductForm(req, res);
+            } else if (pathInfo.equals("/new")) {
+                showCreateProductForm(req, res);
+            } else if(pathInfo.equals("/delete")) {
+                deleteProduct(req, res);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }      
 
     }
 
@@ -171,7 +163,7 @@ public class ProductServlet extends HttpServlet {
         Product product = productMapper.productDTOTProduct(productDTO);
 
         productDAO.updateProduct(product, connection.connectionToPostgresDB());
-        res.sendRedirect(req.getContextPath() + "/product/");
+        res.sendRedirect(req.getContextPath() + REDIRECT_URL_PATH);
     }
 
     private void insertProduct(HttpServletRequest req, HttpServletResponse res) throws IOException, SQLException {
@@ -187,7 +179,7 @@ public class ProductServlet extends HttpServlet {
         Product product = productMapper.productDTOTProduct(productDTO);
 
         productDAO.insertProduct(product, connection.connectionToPostgresDB());
-        res.sendRedirect(req.getContextPath() + "/product/");
+        res.sendRedirect(req.getContextPath() + REDIRECT_URL_PATH);
     }
 
     private void deleteProduct(HttpServletRequest req, HttpServletResponse res) throws IOException, SQLException {
@@ -195,6 +187,6 @@ public class ProductServlet extends HttpServlet {
         int id = Integer.parseInt(req.getParameter("id"));
         productDAO.deleteProduct(id, connection.connectionToPostgresDB());
 
-        res.sendRedirect(req.getContextPath() + "/product/");
+        res.sendRedirect(req.getContextPath() + REDIRECT_URL_PATH);
     }
 }

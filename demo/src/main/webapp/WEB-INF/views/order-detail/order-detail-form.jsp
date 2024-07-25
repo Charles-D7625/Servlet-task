@@ -8,7 +8,7 @@
 </head>
 <body>
     <h2>Edit Order Detail</h2>
-    <form action="update" method="post">
+    <form action="${pageContext.request.contextPath}/order-detail/update" method="post">
         <input type="hidden" name="id" value="${orderDetail.id}" />
         <p>Order Status:
             <select name="orderStatus" required>
@@ -20,5 +20,7 @@
         <p>Total Amount: <input type="text" name="totalAmount" value="${orderDetail.totalAmount}" required/></p>
         <input type="submit" value="Update" />
     </form>
+
+    <a href="${pageContext.request.contextPath}/order-detail">Back to List</a>
 </body>
 </html>

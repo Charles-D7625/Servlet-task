@@ -7,7 +7,10 @@
 </head>
 <body>
 <h2>Order Details</h2>
-<a href="new">Create New Order Detail</a>
+<a href="${pageContext.request.contextPath}/order-detail/new">Create New Order Detail</a>
+<a href="${pageContext.request.contextPath}/order-detail/json" target="_blank">
+    <button type="button">JSON</button>
+</a>
 <table border="1">
     <thead>
         <tr>
@@ -24,8 +27,8 @@
                 <td>${orderDetail.orderStatus.status}</td>
                 <td>${orderDetail.totalAmount}</td>
                 <td>
-                    <a href="edit?id=${orderDetail.id}">Edit</a>
-                    <a href="delete?id=${orderDetail.id}">Delete</a>
+                    <a href="${pageContext.request.contextPath}/order-detail/edit?id=${orderDetail.id}">Edit</a>
+                    <a href="${pageContext.request.contextPath}/order-detail/delete?id=${orderDetail.id}">Delete</a>
                 </td>
             </tr>
         </c:forEach>

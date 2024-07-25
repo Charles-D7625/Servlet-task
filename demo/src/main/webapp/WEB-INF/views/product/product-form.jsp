@@ -7,7 +7,8 @@
 </head>
 <body>
     <h1><c:choose><c:when test="${not empty product.id}">Edit Product</c:when><c:otherwise>New Product</c:otherwise></c:choose></h1>
-    <form action="<c:choose><c:when test='${not empty product.id}'>update</c:when><c:otherwise>insert</c:otherwise></c:choose>" method="post">
+    <form action="<c:choose><c:when test='${not empty product.id}'>${pageContext.request.contextPath}/product/update</c:when>
+        <c:otherwise>${pageContext.request.contextPath}/product/insert</c:otherwise></c:choose>" method="post">
         <c:if test="${not empty product.id}">
             <input type="hidden" name="id" value="${product.id}" />
         </c:if>
@@ -24,5 +25,7 @@
         </p>
         <p><input type="submit" value="<c:choose><c:when test='${not empty product.id}'>Update</c:when><c:otherwise>Create</c:otherwise></c:choose>" /></p>
     </form>
+
+    <a href="${pageContext.request.contextPath}/product">Back to List</a>
 </body>
 </html>

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.classes.OrderDetail;
+import com.example.dto.ProductDTO;
 import com.example.enums.OrderStatus;
 
 public class OrderDetailDAO {
@@ -28,7 +29,7 @@ public class OrderDetailDAO {
 
             orderDetail.setId(resultSet.getInt(1));
             orderDetail.setOrderStatus(OrderStatus.fromString(resultSet.getString(2)));
-            orderDetail.setTotalAmount(resultSet.getDouble(3));
+            orderDetail.setTotalAmount(resultSet.getBigDecimal(3));
 
             listOrderDetail.add(orderDetail);
         }
@@ -63,7 +64,7 @@ public class OrderDetailDAO {
         PreparedStatement statement = connection.prepareStatement(sqlQuery);
 
 
-        statement.setDouble(1, orderDetail.getTotalAmount());
+        statement.setBigDecimal(1, orderDetail.getTotalAmount());
         statement.setString(2, orderDetail.getOrderStatus().getStatus());
         statement.setInt(3, orderDetail.getId());
 
@@ -101,7 +102,7 @@ public class OrderDetailDAO {
 
         orderDetail.setId(resultSet.getInt(1));
         orderDetail.setOrderStatus(OrderStatus.fromString(resultSet.getString(2)));
-        orderDetail.setTotalAmount(resultSet.getDouble(3));
+        orderDetail.setTotalAmount(resultSet.getBigDecimal(3));
 
         connection.close();
 
@@ -126,5 +127,57 @@ public class OrderDetailDAO {
         connection.close();
 
         return orderIds;
+    }
+
+    public List<OrderDetail> getOrderDetailWithProduct(Connection connection) throws SQLException {
+
+        List<OrderDetail> listOrderDetail = new ArrayList<>();
+        
+        String sqlQuery = "SELECT * " + "FROM orderdetail";
+
+        PreparedStatement statement = connection.prepareStatement(sqlQuery);
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            
+            OrderDetail orderDetail = new OrderDetail();   
+
+            orderDetail.setId(resultSet.getInt(1));
+            orderDetail.setOrderStatus(OrderStatus.fromString(resultSet.getString(2)));
+            orderDetail.setTotalAmount(resultSet.getBigDecimal(3));
+            orderDetail.setProducts(getProductByOrderId(resultSet.getInt(1), connection));
+
+            listOrderDetail.add(orderDetail);
+        }
+
+        connection.close();
+
+        return listOrderDetail;
+
+    }
+
+    private List<ProductDTO> getProductByOrderId(int orderId, Connection connection) throws SQLException {
+
+        List<ProductDTO> products = new ArrayList<>();
+
+        String sqlQuery = "SELECT * " + "FROM product WHERE order_id = ?";
+        PreparedStatement statement = connection.prepareStatement(sqlQuery);
+        statement.setInt(1, orderId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+
+            ProductDTO product = new ProductDTO();
+
+            product.setId(resultSet.getInt(1));
+            product.setName(resultSet.getString(2));
+            product.setPrice(resultSet.getBigDecimal(3));
+            product.setQuantity(resultSet.getInt(4));
+            product.setAvailable(resultSet.getBoolean(5));
+
+            products.add(product);
+        }
+
+        return products;
     }
 }
