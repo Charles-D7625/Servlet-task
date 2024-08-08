@@ -1,6 +1,7 @@
 package com.example.classes;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class Product {
     private int quantity;
     private boolean available;
     private int orderId;
+    private List<ProductCategory> productCategories;
 }

@@ -24,7 +24,7 @@
         <c:forEach var="orderDetail" items="${listOrderDetail}">
             <tr>
                 <td>${orderDetail.id}</td>
-                <td>${orderDetail.orderStatus.status}</td>
+                <td>${orderDetail.orderStatus.getStatus()}</td>
                 <td>${orderDetail.totalAmount}</td>
                 <td>
                     <a href="${pageContext.request.contextPath}/order-detail/edit?id=${orderDetail.id}">Edit</a>

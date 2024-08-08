@@ -8,6 +8,7 @@
 <body>
     <h1>Product List</h1>
     <a href="${pageContext.request.contextPath}/product/new">New Product</a>
+    <a href="${pageContext.request.contextPath}/product/json">View JSON</a>
     <table border="1">
         <tr>
             <th>Name</th>

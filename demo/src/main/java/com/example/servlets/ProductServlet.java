@@ -14,6 +14,7 @@ import com.example.dao.OrderDetailDAO;
 import com.example.dao.ProductDAO;
 import com.example.dto.ProductDTO;
 import com.example.mappers.ProductMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -82,6 +83,8 @@ public class ProductServlet extends HttpServlet {
                 showCreateProductForm(req, res);
             } else if(pathInfo.equals("/delete")) {
                 deleteProduct(req, res);
+            } else if(pathInfo.equals("/json")) {
+                viewProductAsJson(req, res);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,5 +191,19 @@ public class ProductServlet extends HttpServlet {
         productDAO.deleteProduct(id, connection.connectionToPostgresDB());
 
         res.sendRedirect(req.getContextPath() + REDIRECT_URL_PATH);
+    }
+
+    private void viewProductAsJson(HttpServletRequest req, HttpServletResponse res) throws IOException {
+
+        try {
+            List<Product> listProducts = productDAO.listAllProducts(connection.connectionToPostgresDB());
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(listProducts);
+            res.setContentType("application/json");
+            res.getWriter().write(json);
+        } catch (NumberFormatException | SQLException e) {
+            e.printStackTrace();
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR , e.getMessage());
+        }
     }
 }

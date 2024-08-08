@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.classes.Product;
+import com.example.classes.ProductCategory;
+import com.example.enums.CategoryType;
 
 public class ProductDAO {
     
@@ -31,6 +33,7 @@ public class ProductDAO {
             product.setQuantity(resultSet.getInt(4));
             product.setAvailable(resultSet.getBoolean(5));
             product.setOrderId(resultSet.getInt(6));
+            product.setProductCategories(getProductCategoriesByProductId(resultSet.getInt(1), connection));
 
             listProduct.add(product);
         }
@@ -113,5 +116,31 @@ public class ProductDAO {
         connection.close();
 
         return product;
+    }
+
+    private List<ProductCategory> getProductCategoriesByProductId(int productId, Connection connection) throws SQLException {
+
+        List<ProductCategory> productCategories = new ArrayList<>();
+        String sqlQuery = "SELECT pc.id, pc.name, pc.type " +
+                          "FROM productcategory pc " +
+                          "JOIN product_productcategory pcc ON pc.id = pcc.category_id " +
+                          "WHERE pcc.product_id = ?";
+
+        PreparedStatement statement = connection.prepareStatement(sqlQuery);
+        statement.setInt(1, productId);
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            
+            ProductCategory productCategory = new ProductCategory();
+
+            productCategory.setId(resultSet.getInt(1));
+            productCategory.setName(resultSet.getString(2));
+            productCategory.setType(CategoryType.fromString(resultSet.getString(3)));
+
+            productCategories.add(productCategory);
+        }
+
+        return productCategories;
     }
 }
